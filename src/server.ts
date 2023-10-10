@@ -1,5 +1,7 @@
 import express, { Express } from "express";
+
 import { UserRoute } from "./routes/users";
+import { TransactionsRoute } from "./routes/transactions";
 
 export class App {
   private app: Express;
@@ -12,7 +14,10 @@ export class App {
 
   private routes() {
     const userRoutes = new UserRoute();
+    const transactionRoutes = new TransactionsRoute();
+
     this.app.use("/api", userRoutes.getRouter());
+    this.app.use("/api", transactionRoutes.getRouter());
   }
 
   public startServer(PORT: number | string) {
