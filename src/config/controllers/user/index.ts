@@ -8,7 +8,6 @@ export class UserController {
         createdAt: "desc",
       },
     });
-    console.log(users);
     return response
       .send({
         data: { users },
