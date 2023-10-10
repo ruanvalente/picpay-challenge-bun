@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import { UserRoute } from "./routes/users";
 
 export class App {
@@ -6,12 +6,13 @@ export class App {
 
   constructor() {
     this.app = express();
+    this.app.use(express.json());
     this.routes();
   }
 
   private routes() {
     const userRoutes = new UserRoute();
-    this.app.use("/users", userRoutes.getRouter());
+    this.app.use("/api", userRoutes.getRouter());
   }
 
   public startServer(PORT: number | string) {
