@@ -9,15 +9,29 @@ export class UserController {
         createdAt: "desc",
       },
     });
-    return response
-      .send({
-        data: { users },
-      })
-      .status(200);
+    return response.status(200).json({
+      data: { users },
+    });
   }
 
   public async createUser(request: Request, response: Response) {
     const { fullName, cpf, password, balance, type } = request.body as User;
+
+    if (!fullName || !cpf || !password || !balance || !type) {
+      return response
+        .status(500)
+        .json({ message: "Error creating user, please try again" });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { cpf },
+    });
+
+    if (existingUser) {
+      return response
+        .status(400)
+        .json({ message: "User already registered in the system" });
+    }
 
     const user = await prisma.user.create({
       data: {
@@ -29,16 +43,8 @@ export class UserController {
       },
     });
 
-    if (!user) {
-      return response
-        .send({ message: "Error creating user, please try again" })
-        .status(400);
-    }
-
-    return response
-      .send({
-        data: { user },
-      })
-      .status(201);
+    return response.status(201).json({
+      data: { user },
+    });
   }
 }
