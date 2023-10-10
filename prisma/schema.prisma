@@ -11,12 +11,22 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  fullName  String
-  cpf       String   @unique
-  password  String
-  balance   Float
-  type      String // type: MERCHANT | USER
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id                   String        @id @default(uuid())
+  fullName             String
+  cpf                  String        @unique
+  password             String
+  balance              Float
+  type                 String // type: MERCHANT | USER
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @default(now())
+  sentTransactions     Transaction[] @relation("SentTransactions")
+  receivedTransactions Transaction[] @relation("ReceivedTransactions")
+}
+
+model Transaction {
+  id          String @id @default(uuid())
+  sender_id   String
+  receiver_id String
+  sender      User   @relation("SentTransactions", fields: [sender_id], references: [id])
+  receiver    User   @relation("ReceivedTransactions", fields: [receiver_id], references: [id])
 }
