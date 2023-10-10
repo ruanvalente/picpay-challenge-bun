@@ -1,21 +1,18 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
+import { UserRoute } from "./routes/users";
 
 export class App {
   private app: Express;
 
   constructor() {
     this.app = express();
+    this.app.use(express.json());
     this.routes();
   }
 
   private routes() {
-    this.app.get("/", (request: Request, response: Response) => {
-      return response
-        .send({
-          data: { user: { name: "John", email: "email@email.com" } },
-        })
-        .status(200);
-    });
+    const userRoutes = new UserRoute();
+    this.app.use("/api", userRoutes.getRouter());
   }
 
   public startServer(PORT: number | string) {
