@@ -1,10 +1,26 @@
-import express from 'express'
+import express, { Express, Request, Response } from "express";
 
-const app = express()
+export class App {
+  private app: Express;
 
-app.get('/', (request, response) => {
-  return response
-    .send({ data: { user: { name: 'John', email: 'john@email.com' } } })
-    .status(200)
-})
-app.listen(3001, () =>  console.log('Server listening on http://localhost:3001'))
+  constructor() {
+    this.app = express();
+    this.routes();
+  }
+
+  private routes() {
+    this.app.get("/", (request: Request, response: Response) => {
+      return response
+        .send({
+          data: { user: { name: "John", email: "email@email.com" } },
+        })
+        .status(200);
+    });
+  }
+
+  public startServer(PORT: number | string) {
+    this.app.listen(PORT, () => {
+      console.log(`Server listening on http://localhost:${PORT}`);
+    });
+  }
+}
