@@ -1,7 +1,8 @@
 import express, { Express } from "express";
-
-import { UserRoute } from "./routes/users";
+import swaggerUi from "swagger-ui-express";
 import { TransactionsRoute } from "./routes/transactions";
+import { UserRoute } from "./routes/users";
+import swaggerFile from "./swagger/swagger_output.json";
 
 export class App {
   private app: Express;
@@ -18,6 +19,7 @@ export class App {
 
     this.app.use("/api", userRoutes.getRouter());
     this.app.use("/api", transactionRoutes.getRouter());
+    this.app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
   }
 
   public startServer(PORT: number | string) {
