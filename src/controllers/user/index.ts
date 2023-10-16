@@ -1,31 +1,33 @@
+import { User } from "@prisma/client";
 import { Request, Response } from "express";
 import { prisma } from "../../config/prisma/prisma-client";
-import { User } from "@prisma/client";
+import { UserService } from "../../services/user-services";
 
 export class UserController {
+  private userService: UserService;
+
+  constructor() {
+    this.userService = new UserService(prisma);
+  }
   public async getAllUsers(request: Request, response: Response) {
-    const users = await prisma.user.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const users = await this.userService.getUsers();
     return response.status(200).json({
       data: { users },
     });
   }
 
   public async createUser(request: Request, response: Response) {
-    const { fullName, cpf, password, balance, type } = request.body as User;
+    const { fullName, cpf, balance, type } = request.body as User;
 
-    if (!fullName || !cpf || !password || !balance || !type) {
+    const isAValidUser = this.userService.checkInvalidUser(request.body);
+
+    if (isAValidUser) {
       return response
         .status(500)
         .json({ message: "Error creating user, please try again" });
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { cpf },
-    });
+    const existingUser = await this.userService.checkExistingUser(cpf);
 
     if (existingUser) {
       return response
@@ -33,18 +35,10 @@ export class UserController {
         .json({ message: "User already registered in the system" });
     }
 
-    const user = await prisma.user.create({
-      data: {
-        fullName,
-        cpf,
-        password,
-        balance,
-        type,
-      },
-    });
+    await this.userService.createUser(request.body);
 
     return response.status(201).json({
-      data: { user },
+      data: { fullName, balance, type },
     });
   }
 }
